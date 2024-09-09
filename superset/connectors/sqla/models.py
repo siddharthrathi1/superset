@@ -173,7 +173,9 @@ class DatasourceKind(StrEnum):
     PHYSICAL = "physical"
 
 
-class BaseDatasource(AuditMixinNullable, ImportExportMixin):  # pylint: disable=too-many-public-methods
+class BaseDatasource(
+    AuditMixinNullable, ImportExportMixin
+):  # pylint: disable=too-many-public-methods
     """A common interface to objects that are queryable
     (tables and datasources)"""
 
@@ -1139,6 +1141,7 @@ sqlatable_user = DBTable(
 def _process_sql_expression(
     expression: str | None,
     database_id: int,
+    engine: str,
     schema: str,
     template_processor: BaseTemplateProcessor | None = None,
 ) -> str | None:
@@ -1149,6 +1152,7 @@ def _process_sql_expression(
             expression = validate_adhoc_subquery(
                 expression,
                 database_id,
+                engine,
                 schema,
             )
             expression = sanitize_clause(expression)
@@ -1555,6 +1559,7 @@ class SqlaTable(
             expression = _process_sql_expression(
                 expression=metric["sqlExpression"],
                 database_id=self.database_id,
+                engine=self.database.backend,
                 schema=self.schema,
                 template_processor=template_processor,
             )
@@ -1585,6 +1590,7 @@ class SqlaTable(
         expression = _process_sql_expression(
             expression=col["sqlExpression"],
             database_id=self.database_id,
+            engine=self.database.backend,
             schema=self.schema,
             template_processor=template_processor,
         )
